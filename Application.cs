@@ -17,7 +17,7 @@ namespace AtUnity {
         // Access Methods
 
         static Application() {
-            API.RegisterClass<Application>();
+            API.RegisterUserType<Application>();
         }
         
         // Public
