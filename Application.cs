@@ -43,7 +43,7 @@ namespace AtUnity {
         // Private Members
         private Vector2 WindowedResolution, FullscreenResolution;
         private float TimePassed = 0f;
-        private int Frames = 0, LatestFPS = 0;
+        private int Frames = 0;
         private string UserPath = "";
 
         // Public Members
@@ -60,9 +60,7 @@ namespace AtUnity {
             return Resolution;
         }
 
-        public int Framerate {
-            get { return LatestFPS; }
-        }
+        public int Framerate { get; set; }
 
         public float GetHeight(FullScreenMode WindowMode) {
             float Height = this.Height;
@@ -358,7 +356,7 @@ namespace AtUnity {
             ++Frames;
 
             if (TimePassed > 1.0) {
-                LatestFPS = Frames;
+                Framerate = Frames;
 
                 TimePassed = 0f;
                 Frames = 0;
