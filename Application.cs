@@ -1,45 +1,10 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using MoonSharp.Interpreter;
 using System;
+using uLua;
 
 namespace AtUnity {
-    [MoonSharpUserData]
-    [MoonSharpHideMember("Lua")]
-
-    //Properties
-    [MoonSharpHideMember("runInEditMode")]
-    [MoonSharpHideMember("useGUILayout")]
-    [MoonSharpHideMember("enabled")]
-    [MoonSharpHideMember("isActiveAndEnabled")]
-    [MoonSharpHideMember("gameObject")]
-    [MoonSharpHideMember("tag")]
-    [MoonSharpHideMember("transform")]
-    [MoonSharpHideMember("hideFlags")]
-    [MoonSharpHideMember("name")]
-
-    //Public Methods
-    [MoonSharpHideMember("CancelInvoke")]
-    [MoonSharpHideMember("Invoke")]
-    [MoonSharpHideMember("InvokeRepeating")]
-    [MoonSharpHideMember("IsInvoking")]
-    [MoonSharpHideMember("StartCoroutine")]
-    [MoonSharpHideMember("StopAllCoroutines")]
-    [MoonSharpHideMember("StopCoroutine")]
-    [MoonSharpHideMember("BroadcastMessage")]
-    [MoonSharpHideMember("CompareTag")]
-    [MoonSharpHideMember("GetComponent")]
-    [MoonSharpHideMember("GetComponentInChildren")]
-    [MoonSharpHideMember("GetComponentInParent")]
-    [MoonSharpHideMember("GetComponents")]
-    [MoonSharpHideMember("GetComponentsInChildren")]
-    [MoonSharpHideMember("GetComponentsInParent")]
-    [MoonSharpHideMember("SendMessage")]
-    [MoonSharpHideMember("SendMessageUpwards")]
-    [MoonSharpHideMember("TryGetComponent")]
-    [MoonSharpHideMember("GetInstanceID")]
-    [MoonSharpHideMember("ToString")]
-    public class Application : MonoBehaviour {
+    public class Application : LuaMonoBehaviour {
         // Private Members
         private Vector2 WindowedResolution, FullscreenResolution;
         private float TimePassed = 0f;
@@ -50,8 +15,12 @@ namespace AtUnity {
         public FullScreenMode WindowMode = FullScreenMode.Windowed;
 
         // Access Methods
-        // Public
 
+        static Application() {
+            API.RegisterClass<Application>();
+        }
+        
+        // Public
         public string AvailableResolutions(int i) {
             string Resolution = "0x0";
 
@@ -140,11 +109,11 @@ namespace AtUnity {
                 //case FullScreenMode.MaximizedWindow:
                 case FullScreenMode.ExclusiveFullScreen:
                 case FullScreenMode.FullScreenWindow:
-                    LuaAPI.OnGlobalEvent("ResolutionChanged");
+                    API.OnEvent("ResolutionChanged");
                     Screen.SetResolution((int)FullscreenResolution.x, (int)FullscreenResolution.y, WindowMode);
                     break;
                 case FullScreenMode.Windowed:
-                    LuaAPI.OnGlobalEvent("ResolutionChanged");
+                    API.OnEvent("ResolutionChanged");
                     Screen.SetResolution((int)WindowedResolution.x, (int)WindowedResolution.y, WindowMode);
                     break;
                 default:
@@ -289,30 +258,21 @@ namespace AtUnity {
         // Private
 
         private void Awake() {
-            // Init Lua
-            LuaAPI.Init();
+            UserPath = Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + "\\Titania\\User\\";
 
             // Register Globals
-            LuaAPI.SetGlobal("Application", this);
+            API.Set("WM_WINDOWED", FullScreenMode.Windowed);
+            API.Set("WM_FULLSCREEN", FullScreenMode.ExclusiveFullScreen);
+            API.Set("WM_BORDERLESS", FullScreenMode.FullScreenWindow);
+            //API.Set("WM_MAXIMISED", FullScreenMode.MaximizedWindow);
 
-            // Window Modes
-            LuaAPI.SetGlobal("WM_WINDOWED", FullScreenMode.Windowed);
-            LuaAPI.SetGlobal("WM_FULLSCREEN", FullScreenMode.ExclusiveFullScreen);
-            LuaAPI.SetGlobal("WM_BORDERLESS", FullScreenMode.FullScreenWindow);
-            //LuaAPI.SetGlobal("WM_MAXIMISED", FullScreenMode.MaximizedWindow);
+            // Register Events
+            API.RegisterEvent("KeyDown");
+            API.RegisterEvent("KeyUp");
+            API.RegisterEvent("ResolutionChanged");
 
-            // Global Events
-            if (LuaAPI.GetGlobal("GlobalEvents").IsNil()) LuaAPI.SetGlobal("GlobalEvents", LuaAPI.NewTable);
-
-            Table GlobalEvents = LuaAPI.GetGlobal<Table>("GlobalEvents");
-
-            GlobalEvents["KeyDown"] = LuaAPI.NewTable;
-            GlobalEvents["KeyUp"] = LuaAPI.NewTable;
-            GlobalEvents["ResolutionChanged"] = LuaAPI.NewTable;
-
-            LuaAPI.SetGlobal("GlobalEvents", GlobalEvents);
-
-            UserPath = Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + "\\Titania\\User\\";
+            // Register
+            API.Register(this);
         }
 
         private bool IsKeyModifier(KeyCode Key) {
@@ -325,13 +285,13 @@ namespace AtUnity {
             if (Event.type == EventType.KeyDown) {
                 if (Event.isKey && Event.keyCode != KeyCode.None) {
                     if (!IsKeyModifier(Event.keyCode) && Event.keyCode != KeyCode.Return) {
-                        LuaAPI.OnGlobalEvent("KeyDown", Event.keyCode);
+                        API.OnEvent("KeyDown", Event.keyCode);
                     }
                 }
             } else if (Event.type == EventType.KeyUp) {
                 if (Event.isKey && Event.keyCode != KeyCode.None) {
                     if (!IsKeyModifier(Event.keyCode) && Event.keyCode != KeyCode.Return) {
-                        LuaAPI.OnGlobalEvent("KeyUp", Event.keyCode);
+                        API.OnEvent("KeyUp", Event.keyCode);
                     }
                 }
             }
@@ -348,7 +308,7 @@ namespace AtUnity {
             // Window Resized
             if (Width != GetWidth(WindowMode) || Height != GetHeight(WindowMode)) {
                 SetResolution(Width + "x" + Height, WindowMode);
-                LuaAPI.OnGlobalEvent("ResolutionChanged");
+                API.OnEvent("ResolutionChanged");
             }
 
             // FPS Math
