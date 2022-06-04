@@ -1,15 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.IO;
+using System.Collections.Generic;
 using UnityEngine;
-using System;
+using MoonSharp.Interpreter;
 using uLua;
 
 namespace AtUnity {
+    [MoonSharpHideMember("UserDirectory")]
     public class Application : LuaMonoBehaviour {
         // Private Members
         private Vector2 WindowedResolution, FullscreenResolution;
         private float TimePassed = 0f;
         private int Frames = 0;
-        private string UserPath = "";
+        [SerializeField] protected string LocalUserDirectory = "";
 
         // Public Members
         public FullScreenMode WindowMode = FullScreenMode.Windowed;
@@ -95,6 +98,10 @@ namespace AtUnity {
             get { return (QualitySettings.vSyncCount == 0)?false:true; }
 
             set { if (value) QualitySettings.vSyncCount = 1; else QualitySettings.vSyncCount = 0; }
+        }
+
+        public string UserDirectory {
+            get { return API.ExternalExecutionDirectory + LocalUserDirectory; }
         }
 
         public float Width {
@@ -223,7 +230,7 @@ namespace AtUnity {
             if (Minute < 10) Date += "0" + Minute.ToString(); else Date += Minute.ToString();
             if (Second < 10) Date += "0" + Second.ToString(); else Date += Second.ToString();
 
-            ScreenCapture.CaptureScreenshot(UserPath + "Screenshots\\" + Date + ".png");
+            ScreenCapture.CaptureScreenshot(UserDirectory + "Screenshots\\" + Date + ".png");
         }
 
         public void SetResolution(string Resolution, FullScreenMode WindowMode) {
@@ -258,7 +265,9 @@ namespace AtUnity {
         // Private
 
         private void Awake() {
-            UserPath = Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + "\\Titania\\User\\";
+            API.ExternalExecutionDirectory = UnityEngine.Application.persistentDataPath+"/";
+
+            if (!Directory.Exists(UserDirectory+"Screenshots/")) Directory.CreateDirectory(UserDirectory+"Screenshots/");
 
             // Register Globals
             API.Set("WM_WINDOWED", FullScreenMode.Windowed);
