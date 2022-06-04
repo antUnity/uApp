@@ -264,7 +264,7 @@ namespace AtUnity {
 
         // Private
 
-        private void Awake() {
+        private new void Awake() {
             if (!Directory.Exists(UserDirectory+"Screenshots/")) Directory.CreateDirectory(UserDirectory+"Screenshots/");
 
             // Register Globals
