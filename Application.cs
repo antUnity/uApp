@@ -265,8 +265,6 @@ namespace AtUnity {
         // Private
 
         private void Awake() {
-            API.ExternalExecutionDirectory = UnityEngine.Application.persistentDataPath+"/";
-
             if (!Directory.Exists(UserDirectory+"Screenshots/")) Directory.CreateDirectory(UserDirectory+"Screenshots/");
 
             // Register Globals
