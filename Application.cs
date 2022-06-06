@@ -12,7 +12,6 @@ namespace AtUnity {
         private Vector2 WindowedResolution, FullscreenResolution;
         private float TimePassed = 0f;
         private int Frames = 0;
-        [SerializeField] protected string LocalUserDirectory = "";
 
         // Public Members
         public FullScreenMode WindowMode = FullScreenMode.Windowed;
@@ -20,9 +19,21 @@ namespace AtUnity {
         // Access Methods
 
         static Application() {
+            // Register Types
             API.RegisterUserType<Application>();
+
+            // Register Events
+            API.RegisterEvent("KeyDown");
+            API.RegisterEvent("KeyUp");
+            API.RegisterEvent("ResolutionChanged");
+
+            // Register Globals
+            Lua.Set("WM_WINDOWED", FullScreenMode.Windowed);
+            Lua.Set("WM_FULLSCREEN", FullScreenMode.ExclusiveFullScreen);
+            Lua.Set("WM_BORDERLESS", FullScreenMode.FullScreenWindow);
+            //Lua.Set("WM_MAXIMISED", FullScreenMode.MaximizedWindow);
         }
-        
+
         // Public
         public string AvailableResolutions(int i) {
             string Resolution = "0x0";
@@ -101,7 +112,7 @@ namespace AtUnity {
         }
 
         public string UserDirectory {
-            get { return API.ExternalExecutionDirectory + LocalUserDirectory; }
+            get { return Lua.ExternalExecutionDirectory; }
         }
 
         public float Width {
@@ -265,21 +276,11 @@ namespace AtUnity {
         // Private
 
         private new void Awake() {
-            if (!Directory.Exists(UserDirectory+"Screenshots/")) Directory.CreateDirectory(UserDirectory+"Screenshots/");
-
-            // Register Globals
-            API.Set("WM_WINDOWED", FullScreenMode.Windowed);
-            API.Set("WM_FULLSCREEN", FullScreenMode.ExclusiveFullScreen);
-            API.Set("WM_BORDERLESS", FullScreenMode.FullScreenWindow);
-            //API.Set("WM_MAXIMISED", FullScreenMode.MaximizedWindow);
-
-            // Register Events
-            API.RegisterEvent("KeyDown");
-            API.RegisterEvent("KeyUp");
-            API.RegisterEvent("ResolutionChanged");
-
             // Register
             API.Register(this);
+
+            if (!Directory.Exists(UserDirectory+"Screenshots/")) Directory.CreateDirectory(UserDirectory+"Screenshots/");
+
         }
 
         private bool IsKeyModifier(KeyCode Key) {
