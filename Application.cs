@@ -127,11 +127,11 @@ namespace AtUnity {
                 //case FullScreenMode.MaximizedWindow:
                 case FullScreenMode.ExclusiveFullScreen:
                 case FullScreenMode.FullScreenWindow:
-                    API.OnEvent("ResolutionChanged");
+                    API.TriggerEvent("ResolutionChanged");
                     Screen.SetResolution((int)FullscreenResolution.x, (int)FullscreenResolution.y, WindowMode);
                     break;
                 case FullScreenMode.Windowed:
-                    API.OnEvent("ResolutionChanged");
+                    API.TriggerEvent("ResolutionChanged");
                     Screen.SetResolution((int)WindowedResolution.x, (int)WindowedResolution.y, WindowMode);
                     break;
                 default:
@@ -275,8 +275,7 @@ namespace AtUnity {
 
         // Private
 
-        private new void Awake() {
-            // Register
+        private void Awake() {
             API.Register(this);
 
             if (!Directory.Exists(UserDirectory+"Screenshots/")) Directory.CreateDirectory(UserDirectory+"Screenshots/");
@@ -293,13 +292,13 @@ namespace AtUnity {
             if (Event.type == EventType.KeyDown) {
                 if (Event.isKey && Event.keyCode != KeyCode.None) {
                     if (!IsKeyModifier(Event.keyCode) && Event.keyCode != KeyCode.Return) {
-                        API.OnEvent("KeyDown", Event.keyCode);
+                        API.TriggerEvent("KeyDown", Event.keyCode);
                     }
                 }
             } else if (Event.type == EventType.KeyUp) {
                 if (Event.isKey && Event.keyCode != KeyCode.None) {
                     if (!IsKeyModifier(Event.keyCode) && Event.keyCode != KeyCode.Return) {
-                        API.OnEvent("KeyUp", Event.keyCode);
+                        API.TriggerEvent("KeyUp", Event.keyCode);
                     }
                 }
             }
@@ -316,7 +315,7 @@ namespace AtUnity {
             // Window Resized
             if (Width != GetWidth(WindowMode) || Height != GetHeight(WindowMode)) {
                 SetResolution(Width + "x" + Height, WindowMode);
-                API.OnEvent("ResolutionChanged");
+                API.TriggerEvent("ResolutionChanged");
             }
 
             // FPS Math
