@@ -38,7 +38,7 @@ namespace AtUnity {
         public string AvailableResolutions(int i) {
             string Resolution = "0x0";
 
-            if (NumResolutionsAvailable > i) Resolution = Screen.resolutions[i].width + "x" + Screen.resolutions[i].height;
+            if (NumResolutionsAvailable > i) Resolution = $"{Screen.resolutions[i].width}x{Screen.resolutions[i].height}";
 
             return Resolution;
         }
@@ -235,13 +235,13 @@ namespace AtUnity {
             int Second = DateTime.Now.Second;
 
             string Date = Year.ToString();
-            if (Month < 10) Date += "0" + Month.ToString(); else Date += Month.ToString();
-            if (Day < 10) Date += "0" + Day.ToString(); else Date += Day.ToString();
-            if (Hour < 10) Date += "0" + Hour.ToString(); else Date += Hour.ToString();
-            if (Minute < 10) Date += "0" + Minute.ToString(); else Date += Minute.ToString();
-            if (Second < 10) Date += "0" + Second.ToString(); else Date += Second.ToString();
+            if (Month < 10) Date += $"0{Month.ToString()}"; else Date += Month.ToString();
+            if (Day < 10) Date += $"0{Day.ToString()}"; else Date += Day.ToString();
+            if (Hour < 10) Date += $"0{Hour.ToString()}"; else Date += Hour.ToString();
+            if (Minute < 10) Date += $"0{Minute.ToString()}"; else Date += Minute.ToString();
+            if (Second < 10) Date += $"0{Second.ToString()}"; else Date += Second.ToString();
 
-            ScreenCapture.CaptureScreenshot(UserDirectory + "Screenshots\\" + Date + ".png");
+            ScreenCapture.CaptureScreenshot($"{UserDirectory}Screenshots/{Date}.png");
         }
 
         public void SetResolution(string Resolution, FullScreenMode WindowMode) {
@@ -278,7 +278,7 @@ namespace AtUnity {
         private void Awake() {
             API.Expose(this);
 
-            if (!Directory.Exists(UserDirectory+"Screenshots/")) Directory.CreateDirectory(UserDirectory+"Screenshots/");
+            if (!Directory.Exists($"{UserDirectory}Screenshots/")) Directory.CreateDirectory($"{UserDirectory}Screenshots/");
 
         }
 
