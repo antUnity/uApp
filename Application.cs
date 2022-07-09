@@ -16,7 +16,7 @@ namespace antSoftware {
         [SerializeField] private Vector2 _WindowedResolution;
 
         /** <summary>Keeps track of the requested fullscreen resolution.</summary> */
-        [SerializeField] private Vector2 _FullscreenResolution;
+        [SerializeField] private Vector2 _FullScreenResolution;
 
         /** <summary>Counts the time passed since the last framerate update.</summary> */
         private float TimePassed = 0f;
@@ -52,23 +52,17 @@ namespace antSoftware {
 
         // Public
 
-        /// <summary>Returns the environment resolution (e.g. desktop resolution in Windows).</summary>
-        /** The resolution is returned as a string with the format: ```{Width}x{Height}```. */
-        public string EnvironmentResolution {
-            get { return $"{Screen.currentResolution.width}x{Screen.currentResolution.height}"; }
-        }
-
         /// <summary>Returns the last measured framerate of the application.</summary>
         /** The framerate is measured by counting the number of frames rendered in one second of real time. */
         public int Framerate { get; private set; }
 
         /// <summary>Returns the requested fullscreen resolution.</summary>
         /** The resolution is returned as a string with the format: ```{Width}x{Height}```. */
-        public string FullscreenResolution {
-            get { return $"{_FullscreenResolution.x}x{_FullscreenResolution.y}"; }
+        public string FullScreenResolution {
+            get { return $"{_FullScreenResolution.x}x{_FullScreenResolution.y}"; }
             set {
                 List<string> FullscreenResolution = new List<string>(value.Split('x'));
-                if (FullscreenResolution.Count == 2) _FullscreenResolution = new Vector2(int.Parse(FullscreenResolution[0]), int.Parse(FullscreenResolution[1]));
+                if (FullscreenResolution.Count == 2) _FullScreenResolution = new Vector2(int.Parse(FullscreenResolution[0]), int.Parse(FullscreenResolution[1]));
             }
         }
 
@@ -76,6 +70,12 @@ namespace antSoftware {
         /** This property uses ```Screen.height``` which only updates one frame after the resolution is changed. */
         public float Height {
             get { return Screen.height; }
+        }
+
+        /// <summary>Returns the native environment resolution (e.g. desktop resolution in Windows).</summary>
+        /** The resolution is returned as a string with the format: ```{Width}x{Height}```. */
+        public string NativeResolution {
+            get { return $"{Screen.currentResolution.width}x{Screen.currentResolution.height}"; }
         }
 
         /// <summary>Returns the number of available resolutions for the application.</summary>
@@ -91,7 +91,7 @@ namespace antSoftware {
         }
 
         /// <summary>Returns the requested resolution based on the current WindowMode setting.</summary>
-        /** ```FullScreenWindow``` returns ```EnvironmentResolution```. 
+        /** ```FullScreenWindow``` returns ```NativeResolution```. 
          *  ```ExclusiveFullScreen``` returns ```FullScreenResolution```. 
          *  ```Windowed``` returns ```WindowedResolution```. 
          *  The resolution is returned as a string with the format: ```{Width}x{Height}```. */
@@ -101,10 +101,10 @@ namespace antSoftware {
 
                 switch (WindowMode) {
                     case FullScreenMode.FullScreenWindow:
-                        RequestedResolution = EnvironmentResolution;
+                        RequestedResolution = NativeResolution;
                         break;
                     case FullScreenMode.ExclusiveFullScreen:
-                        RequestedResolution = FullscreenResolution;
+                        RequestedResolution = FullScreenResolution;
                         break;
                     case FullScreenMode.Windowed:
                         RequestedResolution = WindowedResolution;
@@ -127,7 +127,7 @@ namespace antSoftware {
                 if (Resolution.Count == 2) {
                     switch (WindowMode) {
                         case FullScreenMode.ExclusiveFullScreen:
-                            _FullscreenResolution = new Vector2(int.Parse(Resolution[0]), int.Parse(Resolution[1]));
+                            _FullScreenResolution = new Vector2(int.Parse(Resolution[0]), int.Parse(Resolution[1]));
                             break;
                         case FullScreenMode.Windowed:
                             _WindowedResolution = new Vector2(int.Parse(Resolution[0]), int.Parse(Resolution[1]));
@@ -178,7 +178,7 @@ namespace antSoftware {
             switch (WindowMode) {
                 case FullScreenMode.ExclusiveFullScreen:
                 case FullScreenMode.FullScreenWindow:
-                    Screen.SetResolution((int)_FullscreenResolution.x, (int)_FullscreenResolution.y, WindowMode);
+                    Screen.SetResolution((int)_FullScreenResolution.x, (int)_FullScreenResolution.y, WindowMode);
                     API.Invoke("ResolutionChanged");
                     break;
                 case FullScreenMode.Windowed:
@@ -306,7 +306,7 @@ namespace antSoftware {
 
             // Initialise video mode variables
             WindowMode = Screen.fullScreenMode;
-            FullscreenResolution = EnvironmentResolution;
+            FullScreenResolution = NativeResolution;
             WindowedResolution = Resolution;
 
             Debug.Log($"Application: Started in {Resolution} ({WindowMode} mode).");
@@ -343,7 +343,7 @@ namespace antSoftware {
         /// <summary>Measures the framerate and corrects the video mode in special cases.</summary>
         /** This method makes sure certain platform-specific behaviours are always kept consistent.
          *  ```MaximizedWindow``` is only used in the OSXPlayer, ```ExclusiveFullScreen``` is used in the WindowsPlayer.
-         *  In Android platforms the resolution is set by the ```EnvironmentResolution``` and the window mode is always set to ```FullScreenWindow```. */
+         *  In Android platforms the resolution is set by the ```NativeResolution``` and the window mode is always set to ```FullScreenWindow```. */
         private void Update() {
             // Correct Video Mode
 #if UNITY_STANDALONE
