@@ -52,14 +52,6 @@ namespace antSoftware {
 
         // Public
 
-        /// <summary>Returns the resolution at the specified index from the list of available resolutions.</summary>
-        /** @param i The index of the requested resolution. */
-        public string AvailableResolutions(int i) {
-            string AvailableResolutions = "0x0";
-            if (NumResolutionsAvailable > i) AvailableResolutions = $"{Screen.resolutions[i].width}x{Screen.resolutions[i].height}";
-            return AvailableResolutions;
-        }
-
         /// <summary>Returns the environment resolution (e.g. desktop resolution in Windows).</summary>
         /** The resolution is returned as a string with the format: ```{Width}x{Height}```. */
         public string EnvironmentResolution {
@@ -200,6 +192,14 @@ namespace antSoftware {
             ResolutionChangedThisFrame = true;
 
             Debug.Log($"Application: Video Mode set to {RequestedResolution} ({WindowMode} mode).");
+        }
+
+        /// <summary>Returns the resolution at the specified index from the list of available resolutions.</summary>
+        /** @param i The index of the requested resolution. */
+        public string AvailableResolutions(int i) {
+            string AvailableResolutions = "0x0";
+            if (NumResolutionsAvailable > i) AvailableResolutions = $"{Screen.resolutions[i].width}x{Screen.resolutions[i].height}";
+            return AvailableResolutions;
         }
 
         /// <summary>Checks if the specified key is pressed.</summary>
