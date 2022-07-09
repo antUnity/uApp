@@ -43,10 +43,11 @@ namespace antSoftware {
             Lua.Set("uKeyCustomAlt", (int)KeyCode.RightAlt + (int)KeyCode.LeftAlt);
             Lua.Set("uKeyCustomControl", (int)KeyCode.RightControl + (int)KeyCode.LeftControl);
 
-            // Window Mode Globals
-            Lua.Set("WM_WINDOWED", FullScreenMode.Windowed);
-            Lua.Set("WM_FULLSCREEN", FullScreenMode.ExclusiveFullScreen);
-            Lua.Set("WM_BORDERLESS", FullScreenMode.FullScreenWindow);
+            // Window Mode enum
+            Values = System.Enum.GetValues(typeof(FullScreenMode));
+            foreach (FullScreenMode FullScreenMode in Values) {
+                Lua.Set("uWM_" + FullScreenMode.ToString(), FullScreenMode);
+            }
         }
 
         // Public
