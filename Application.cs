@@ -298,6 +298,9 @@ namespace antSoftware {
         protected override void Awake() {
             base.Awake();
 
+            API.LoadSavedData(this);
+            API.RegisterEventHandler("SceneLoaded", "OnSceneLoaded", this);
+
             // Set up screenshot directory
             if (!Directory.Exists($"{ExternalDirectory}Screenshots/")) {
                 Directory.CreateDirectory($"{ExternalDirectory}Screenshots/");
@@ -310,6 +313,13 @@ namespace antSoftware {
             WindowedResolution = Resolution;
 
             Debug.Log($"Application: Started in {Resolution} ({WindowMode} mode).");
+        }
+
+        protected override void OnDestroy() {
+            base.OnDestroy();
+
+            API.SaveData(this);
+            API.RemoveEventHandlers(this);
         }
 
         // Private
